@@ -8,7 +8,11 @@ public class ReadingWordsStrategy implements ReadingStrategy {
 
     private Scanner scanner;
 
-    public ReadingWordsStrategy(Scanner scanner) {
+    public ReadingWordsStrategy() {
+    }
+
+    @Override
+    public void setScanner(Scanner scanner) {
         this.scanner = scanner;
     }
 

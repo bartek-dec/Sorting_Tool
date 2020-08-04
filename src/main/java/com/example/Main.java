@@ -1,5 +1,12 @@
 package com.example;
 
+import com.example.data.DataProcessor;
+import com.example.data.Processor;
+import com.example.output.ListPrinter;
+import com.example.output.ListPrinterImpl;
+import com.example.output.MessagePrinter;
+import com.example.output.factory.PrinterFactory;
+import com.example.strategy.factory.ReadingStrategyFactory;
 import com.example.strategy.*;
 
 import java.util.*;
@@ -8,69 +15,48 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Context context = new Context();
-        String parameter = args[1];
-        List<Object> inputs = null;
+        Processor processor = new DataProcessor();
+        ReadingStrategyFactory strategyFactory = new ReadingStrategyFactory();
+        PrinterFactory printerFactory = new PrinterFactory();
+        List<Object> inputs;
+        String parameter;
+        boolean isSort = false;
 
-        switch (parameter) {
-            case "long":
-                inputs = context.getInputs(new ReadingIntegersStrategy(scanner));
-                break;
-            case "line":
-                inputs = context.getInputs(new ReadingLinesStrategy(scanner));
-                break;
-            case "word":
-                inputs = context.getInputs(new ReadingWordsStrategy(scanner));
-        }
-
-        long totalNumber = inputs.stream().count();
-
-        int greatest = 0;
-        String longest = null;
-        Long quantity;
-
-        if (Objects.equals(parameter, "long")) {
-            Optional<Integer> optional = inputs.stream()
-                    .map(o -> (Integer) o)
-                    .max(Comparator.naturalOrder());
-
-            greatest = optional.get();
+        if (Arrays.asList(args).contains("-sortIntegers")) {
+            isSort = true;
+            parameter = "long";
         } else {
-            Optional<String> optional = inputs.stream()
-                    .map(o -> (String) o)
-                    .max(Comparator.comparingInt(String::length));
-
-            longest = optional.get();
+            parameter = args[1];
         }
 
-        if (Objects.equals(parameter, "long")) {
-            int finalGreatest = greatest;
-            quantity = inputs.stream()
-                    .map(o -> (Integer) o)
-                    .filter(o -> o == finalGreatest)
-                    .count();
+        ReadingStrategy strategy = strategyFactory.getStrategy(parameter);
+        strategy.setScanner(scanner);
+        inputs = context.getInputs(strategy);
+
+        if (isSort) {
+            List<Integer> integers = processor.sortAscending(inputs);
+            ListPrinter printer = new ListPrinterImpl();
+            System.out.println(printer.printList(integers));
         } else {
-            String finalLongest = longest;
-            quantity = inputs.stream()
-                    .map(o -> (String) o)
-                    .filter(o -> o.equals(finalLongest))
-                    .count();
+            MessagePrinter messagePrinter = printerFactory.getPrinter(parameter);
+
+            long totalNumber = processor.countInputs(inputs);
+            Long quantity;
+            int percentage;
+
+            if (Objects.equals(parameter, "long")) {
+                int greatest = processor.getGreatest(inputs);
+                quantity = processor.getQuantity(inputs, greatest);
+                percentage = processor.getPercentage(quantity, totalNumber);
+
+                System.out.println(messagePrinter.printMessage(totalNumber, Integer.toString(greatest), quantity, percentage));
+            } else {
+                String longest = processor.getLongest(inputs);
+                quantity = processor.getQuantity(inputs, longest);
+                percentage = processor.getPercentage(quantity, totalNumber);
+
+                System.out.println(messagePrinter.printMessage(totalNumber, longest, quantity, percentage));
+            }
         }
-
-        double percente = ((1.0 * quantity) / totalNumber) * 100;
-        long percentage = (long) percente;
-
-        if (Objects.equals(parameter, "long")) {
-            System.out.println("Total numbers: " + totalNumber + ".");
-            System.out.println("The greatest number: " + greatest + " (" + quantity + " time(s), " + percentage + "%).");
-        } else if (Objects.equals(parameter, "word")) {
-            System.out.println("Total words: " + totalNumber + ".");
-            System.out.println("The longest word: " + longest + " (" + quantity + " time(s), " + percentage + "%).");
-        } else {
-            System.out.println("Total lines: " + totalNumber + ".");
-            System.out.println("The longest line:");
-            System.out.println(longest);
-            System.out.println("(" + quantity + " time(s), " + percentage + "%).");
-        }
-
     }
 }
