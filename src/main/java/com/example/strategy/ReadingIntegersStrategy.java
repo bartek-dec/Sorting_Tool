@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ReadingIntegersStrategy implements ReadingStrategy<Integer> {
+public class ReadingIntegersStrategy implements ReadingStrategy<Long> {
 
     private Scanner scanner;
 
@@ -17,18 +17,17 @@ public class ReadingIntegersStrategy implements ReadingStrategy<Integer> {
     }
 
     @Override
-    public List<Integer> readInputs() {
-        List<Integer> inputs = new ArrayList<>();
+    public List<Long> readInputs() {
+        List<Long> inputs = new ArrayList<>();
 
         while (scanner.hasNext()) {
-            try {
-                String[] line = scanner.nextLine().split("\\s+");
-
-                for (String s : line) {
-                    inputs.add(Integer.parseInt(s));
+            String[] line = scanner.nextLine().split("\\s+");
+            for (String s : line) {
+                try {
+                    inputs.add(Long.parseLong(s));
+                } catch (NumberFormatException e) {
+                    System.out.println(s + " isn't a long. It's skipped");
                 }
-            } catch (NumberFormatException e) {
-                return null;
             }
         }
         return inputs;

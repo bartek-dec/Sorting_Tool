@@ -4,10 +4,10 @@ import com.example.Result;
 
 import java.util.List;
 
-public class IntegerPrinter implements IntPrinter, ResultPrinter<Integer> {
+public class IntegerPrinter implements IntPrinter, ResultPrinter<Long> {
 
     @Override
-    public String printIntegerList(List<Integer> integers) {
+    public String printIntegerList(List<Long> integers) {
         if (integers == null) {
             return null;
         }
@@ -24,7 +24,7 @@ public class IntegerPrinter implements IntPrinter, ResultPrinter<Integer> {
     }
 
     @Override
-    public String printResultList(List<Result<Integer>> results, int quantity) {
+    public String printResultList(List<Result<Long>> results, int quantity) {
         if (results == null) {
             return null;
         }

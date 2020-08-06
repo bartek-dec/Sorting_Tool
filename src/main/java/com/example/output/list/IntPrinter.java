@@ -4,5 +4,5 @@ import java.util.List;
 
 public interface IntPrinter {
 
-    String printIntegerList(List<Integer> integers);
+    String printIntegerList(List<Long> integers);
 }

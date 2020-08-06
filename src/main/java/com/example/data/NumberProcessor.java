@@ -6,23 +6,23 @@ import com.example.Result;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class NumberProcessor implements Processor<Integer> {
+public class NumberProcessor implements Processor<Long> {
 
     @Override
-    public Long countInputs(List<Integer> inputs) {
+    public Long countInputs(List<Long> inputs) {
         return inputs.stream().count();
     }
 
     @Override
-    public Integer getGreatest(List<Integer> inputs) {
-        Optional<Integer> optional = inputs.stream()
+    public Long getGreatest(List<Long> inputs) {
+        Optional<Long> optional = inputs.stream()
                 .max(Comparator.naturalOrder());
 
         return optional.orElse(null);
     }
 
     @Override
-    public Long getQuantity(List<Integer> inputs, Integer itemToFind) {
+    public Long getQuantity(List<Long> inputs, Long itemToFind) {
         return inputs.stream()
                 .filter(o -> o == itemToFind.intValue())
                 .count();
@@ -36,27 +36,27 @@ public class NumberProcessor implements Processor<Integer> {
     }
 
     @Override
-    public List<Integer> sortAscending(List<Integer> inputs) {
-        List<Integer> integers = inputs.stream()
+    public List<Long> sortAscending(List<Long> inputs) {
+        List<Long> integers = inputs.stream()
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
         return integers;
     }
 
     @Override
-    public List<Result<Integer>> sortByCount(List<Integer> inputs) {
-        List<Integer> sortedAndUnique = inputs.stream()
+    public List<Result<Long>> sortByCount(List<Long> inputs) {
+        List<Long> sortedAndUnique = inputs.stream()
                 .distinct()
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
 
-        List<Result<Integer>> results = new ArrayList<>();
+        List<Result<Long>> results = new ArrayList<>();
         int size = sortedAndUnique.size();
         int totalNumber = inputs.size();
         for (int i = 0; i < size; i++) {
-            Result<Integer> result = new IntResult();
+            Result<Long> result = new IntResult();
 
-            int current = sortedAndUnique.get(i);
+            long current = sortedAndUnique.get(i);
             long count = getQuantity(inputs, current);
             int percentage = getPercentage(count, totalNumber);
 
@@ -67,7 +67,7 @@ public class NumberProcessor implements Processor<Integer> {
         }
 
         return results.stream()
-                .sorted(Comparator.comparingInt(o -> o.getEntry()))
+                .sorted(Comparator.comparingLong(o -> o.getEntry()))
                 .sorted(Comparator.comparingLong(o -> o.getCount()))
                 .collect(Collectors.toList());
     }

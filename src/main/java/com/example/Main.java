@@ -17,39 +17,102 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         List<String> parameters = Arrays.asList(args);
 
-        String inputType;
-        int index = parameters.indexOf("-dataType");
-        inputType = parameters.get(index + 1);
+        int index;
+        String validType = null;
+        String type;
+        if (parameters.contains("-dataType")) {
+            index = parameters.indexOf("-dataType");
+            try {
+                index++;
+                type = parameters.get(index);
+                while (!Objects.equals(type, "-sortingType")) {
 
-        String sortType;
+                    if (Objects.equals(type, "long") ||
+                            Objects.equals(type, "word") ||
+                            Objects.equals(type, "line")) {
+                        validType = type;
+                    } else {
+                        System.out.println("\"" + type + "\" isn't a valid parameter. It's skipped.");
+                    }
+                    index++;
+                    type = parameters.get(index);
+                }
+            } catch (IndexOutOfBoundsException e) {
+                if (!Objects.equals(validType, "long") &&
+                        !Objects.equals(validType, "word") &&
+                        !Objects.equals(validType, "line")) {
+                    System.out.println("No data type defined!");
+                    return;
+                }
+            }
+
+            if (!Objects.equals(validType, "long") &&
+                    !Objects.equals(validType, "word") &&
+                    !Objects.equals(validType, "line")) {
+                System.out.println("No data type defined!");
+                return;
+            }
+        } else {
+            validType = "word";
+        }
+
+
+        String validSort = null;
+        String sort;
         if (parameters.contains("-sortingType")) {
             index = parameters.indexOf("-sortingType");
-            sortType = parameters.get(index + 1);
+            try {
+                index++;
+                sort = parameters.get(index);
+                while (!Objects.equals(sort, "-dataType")) {
+
+                    if (Objects.equals(sort, "natural") ||
+                            Objects.equals(sort, "byCount")) {
+                        validSort = sort;
+                    } else {
+                        System.out.println("\"" + sort + "\" isn't a valid parameter. It's skipped.");
+                    }
+                    index++;
+                    sort = parameters.get(index);
+                }
+            } catch (IndexOutOfBoundsException e) {
+                if (!Objects.equals(validSort, "natural") &&
+                        !Objects.equals(validSort, "byCount")) {
+                    System.out.println("No sorting type defined!");
+                    return;
+                }
+            }
+
+            if (!Objects.equals(validSort, "natural") &&
+                    !Objects.equals(validSort, "byCount")) {
+                System.out.println("No sorting type defined!");
+                return;
+            }
         } else {
-            sortType = "natural";
+            validSort = "natural";
         }
 
         WordPrinter wordPrinter = new WordPrinter();
-        if (Objects.equals(inputType, "long")) {
+        if (Objects.equals(validType, "long")) {
             IntegerPrinter integerPrinter = new IntegerPrinter();
-            Processor<Integer> processor = new NumberProcessor();
-            ReadingStrategy<Integer> strategy = new ReadingIntegersStrategy();
+            Processor<Long> processor = new NumberProcessor();
+            ReadingStrategy<Long> strategy = new ReadingIntegersStrategy();
             strategy.setScanner(scanner);
 
-            Context<Integer> context = new Context<>();
+            Context<Long> context = new Context<>();
             context.setStrategy(strategy);
-            List<Integer> integers = context.getInputs();
+            List<Long> integers = context.getInputs();
 
-            if (Objects.equals(sortType, "natural")) {
-                List<Integer> sorted = processor.sortAscending(integers);
+            if (Objects.equals(validSort, "natural")) {
+                List<Long> sorted = processor.sortAscending(integers);
                 System.out.println(integerPrinter.printIntegerList(sorted));
             } else {
-                List<Result<Integer>> sorted = processor.sortByCount(integers);
+                List<Result<Long>> sorted = processor.sortByCount(integers);
                 int size = integers.size();
                 System.out.println(integerPrinter.printResultList(sorted, size));
             }
 
-        } else if (Objects.equals(inputType, "word")) {
+        } else if (Objects.equals(validType, "word")) {
             Processor<String> processor = new StringProcessor();
             ReadingStrategy<String> strategy = new ReadingWordsStrategy();
             strategy.setScanner(scanner);
@@ -58,7 +121,7 @@ public class Main {
             context.setStrategy(strategy);
             List<String> strings = context.getInputs();
 
-            if (Objects.equals(sortType, "natural")) {
+            if (Objects.equals(validSort, "natural")) {
                 List<String> sorted = processor.sortAscending(strings);
                 System.out.println(wordPrinter.printWordList(sorted));
             } else {
@@ -67,7 +130,7 @@ public class Main {
                 System.out.println(wordPrinter.printResultList(sorted, size));
             }
 
-        } else if (Objects.equals(inputType, "line")) {
+        } else if (Objects.equals(validType, "line")) {
             Processor<String> processor = new StringProcessor();
             ReadingStrategy<String> strategy = new ReadingLinesStrategy();
             strategy.setScanner(scanner);
@@ -76,7 +139,7 @@ public class Main {
             context.setStrategy(strategy);
             List<String> strings = context.getInputs();
 
-            if (Objects.equals(sortType, "natural")) {
+            if (Objects.equals(validSort, "natural")) {
                 List<String> sorted = processor.sortAscending(strings);
                 System.out.println(wordPrinter.printLineList(sorted));
             } else {

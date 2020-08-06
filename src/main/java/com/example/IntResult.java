@@ -1,18 +1,18 @@
 package com.example;
 
-public class IntResult implements Result<Integer> {
+public class IntResult implements Result<Long> {
 
-    private Integer entry;
+    private Long entry;
     private long count;
     private int percentage;
 
     @Override
-    public Integer getEntry() {
+    public Long getEntry() {
         return entry;
     }
 
     @Override
-    public void setEntry(Integer entry) {
+    public void setEntry(Long entry) {
         this.entry = entry;
     }
 
