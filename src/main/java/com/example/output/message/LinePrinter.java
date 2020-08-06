@@ -1,4 +1,6 @@
-package com.example.output;
+package com.example.output.message;
+
+import com.example.output.message.MessagePrinter;
 
 public class LinePrinter implements MessagePrinter {
 

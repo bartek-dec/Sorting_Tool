@@ -1,4 +1,4 @@
-package com.example.output;
+package com.example.output.message;
 
 public interface MessagePrinter {
 

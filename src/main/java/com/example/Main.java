@@ -1,61 +1,88 @@
 package com.example;
 
-import com.example.data.DataProcessor;
+import com.example.data.NumberProcessor;
 import com.example.data.Processor;
-import com.example.output.ListPrinter;
-import com.example.output.ListPrinterImpl;
-import com.example.output.MessagePrinter;
-import com.example.output.factory.PrinterFactory;
-import com.example.strategy.factory.ReadingStrategyFactory;
+import com.example.data.StringProcessor;
+import com.example.output.list.IntegerPrinter;
+import com.example.output.list.WordPrinter;
 import com.example.strategy.*;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Context context = new Context();
-        Processor processor = new DataProcessor();
-        ReadingStrategyFactory strategyFactory = new ReadingStrategyFactory();
-        PrinterFactory printerFactory = new PrinterFactory();
-        List<Object> inputs;
-        String parameter;
-        boolean isSort = false;
+        List<String> parameters = Arrays.asList(args);
 
-        if (Arrays.asList(args).contains("-sortIntegers")) {
-            isSort = true;
-            parameter = "long";
+        String inputType;
+        int index = parameters.indexOf("-dataType");
+        inputType = parameters.get(index + 1);
+
+        String sortType;
+        if (parameters.contains("-sortingType")) {
+            index = parameters.indexOf("-sortingType");
+            sortType = parameters.get(index + 1);
         } else {
-            parameter = args[1];
+            sortType = "natural";
         }
 
-        ReadingStrategy strategy = strategyFactory.getStrategy(parameter);
-        strategy.setScanner(scanner);
-        inputs = context.getInputs(strategy);
+        WordPrinter wordPrinter = new WordPrinter();
+        if (Objects.equals(inputType, "long")) {
+            IntegerPrinter integerPrinter = new IntegerPrinter();
+            Processor<Integer> processor = new NumberProcessor();
+            ReadingStrategy<Integer> strategy = new ReadingIntegersStrategy();
+            strategy.setScanner(scanner);
 
-        if (isSort) {
-            List<Integer> integers = processor.sortAscending(inputs);
-            ListPrinter printer = new ListPrinterImpl();
-            System.out.println(printer.printList(integers));
-        } else {
-            MessagePrinter messagePrinter = printerFactory.getPrinter(parameter);
+            Context<Integer> context = new Context<>();
+            context.setStrategy(strategy);
+            List<Integer> integers = context.getInputs();
 
-            long totalNumber = processor.countInputs(inputs);
-            Long quantity;
-            int percentage;
-
-            if (Objects.equals(parameter, "long")) {
-                int greatest = processor.getGreatest(inputs);
-                quantity = processor.getQuantity(inputs, greatest);
-                percentage = processor.getPercentage(quantity, totalNumber);
-
-                System.out.println(messagePrinter.printMessage(totalNumber, Integer.toString(greatest), quantity, percentage));
+            if (Objects.equals(sortType, "natural")) {
+                List<Integer> sorted = processor.sortAscending(integers);
+                System.out.println(integerPrinter.printIntegerList(sorted));
             } else {
-                String longest = processor.getLongest(inputs);
-                quantity = processor.getQuantity(inputs, longest);
-                percentage = processor.getPercentage(quantity, totalNumber);
+                List<Result<Integer>> sorted = processor.sortByCount(integers);
+                int size = integers.size();
+                System.out.println(integerPrinter.printResultList(sorted, size));
+            }
 
-                System.out.println(messagePrinter.printMessage(totalNumber, longest, quantity, percentage));
+        } else if (Objects.equals(inputType, "word")) {
+            Processor<String> processor = new StringProcessor();
+            ReadingStrategy<String> strategy = new ReadingWordsStrategy();
+            strategy.setScanner(scanner);
+
+            Context<String> context = new Context<>();
+            context.setStrategy(strategy);
+            List<String> strings = context.getInputs();
+
+            if (Objects.equals(sortType, "natural")) {
+                List<String> sorted = processor.sortAscending(strings);
+                System.out.println(wordPrinter.printWordList(sorted));
+            } else {
+                List<Result<String>> sorted = processor.sortByCount(strings);
+                int size = strings.size();
+                System.out.println(wordPrinter.printResultList(sorted, size));
+            }
+
+        } else if (Objects.equals(inputType, "line")) {
+            Processor<String> processor = new StringProcessor();
+            ReadingStrategy<String> strategy = new ReadingLinesStrategy();
+            strategy.setScanner(scanner);
+
+            Context<String> context = new Context<>();
+            context.setStrategy(strategy);
+            List<String> strings = context.getInputs();
+
+            if (Objects.equals(sortType, "natural")) {
+                List<String> sorted = processor.sortAscending(strings);
+                System.out.println(wordPrinter.printLineList(sorted));
+            } else {
+                List<Result<String>> sorted = processor.sortByCount(strings);
+                int size = strings.size();
+                System.out.println(wordPrinter.printResultList(sorted, size));
             }
         }
     }

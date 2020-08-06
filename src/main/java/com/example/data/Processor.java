@@ -1,20 +1,20 @@
 package com.example.data;
 
+import com.example.Result;
+
 import java.util.List;
 
-public interface Processor {
+public interface Processor<T> {
 
-    Long countInputs(List<Object> inputs);
+    Long countInputs(List<T> inputs);
 
-    Integer getGreatest(List<Object> inputs);
+    T getGreatest(List<T> inputs);
 
-    String getLongest(List<Object> inputs);
-
-    Long getQuantity(List<Object> inputs, int numToFind);
-
-    Long getQuantity(List<Object> inputs, String wordToFind);
+    Long getQuantity(List<T> inputs, T itemToFind);
 
     Integer getPercentage(long quantity, long totalNum);
 
-    List<Integer> sortAscending(List<Object> inputs);
+    List<T> sortAscending(List<T> inputs);
+
+    List<Result<T>> sortByCount(List<T> inputs);
 }

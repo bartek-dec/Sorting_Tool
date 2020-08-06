@@ -3,9 +3,9 @@ package com.example.strategy;
 import java.util.List;
 import java.util.Scanner;
 
-public interface ReadingStrategy {
+public interface ReadingStrategy <T>{
 
     void setScanner(Scanner scanner);
 
-    List<Object> readInputs();
+    List<T> readInputs();
 }

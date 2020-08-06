@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ReadingLinesStrategy implements ReadingStrategy {
+public class ReadingLinesStrategy implements ReadingStrategy<String> {
 
     private Scanner scanner;
 
@@ -17,8 +17,8 @@ public class ReadingLinesStrategy implements ReadingStrategy {
     }
 
     @Override
-    public List<Object> readInputs() {
-        List<Object> inputs = new ArrayList<>();
+    public List<String> readInputs() {
+        List<String> inputs = new ArrayList<>();
 
         while (scanner.hasNext()) {
             inputs.add(scanner.nextLine());

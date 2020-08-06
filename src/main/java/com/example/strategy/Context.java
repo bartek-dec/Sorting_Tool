@@ -2,9 +2,15 @@ package com.example.strategy;
 
 import java.util.List;
 
-public class Context {
+public class Context<T> {
 
-    public List<Object> getInputs(ReadingStrategy strategy) {
+    private ReadingStrategy<T> strategy;
+
+    public void setStrategy(ReadingStrategy<T> strategy) {
+        this.strategy = strategy;
+    }
+
+    public List<T> getInputs() {
         return strategy.readInputs();
     }
 }
