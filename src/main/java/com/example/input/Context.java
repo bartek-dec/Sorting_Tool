@@ -1,4 +1,4 @@
-package com.example.input.console;
+package com.example.input;
 
 import java.util.List;
 

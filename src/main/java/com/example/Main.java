@@ -4,6 +4,8 @@ import com.example.data.manipulate.NumberProcessor;
 import com.example.data.manipulate.Processor;
 import com.example.data.manipulate.StringProcessor;
 import com.example.data.result.Result;
+import com.example.input.Context;
+import com.example.input.Strategy;
 import com.example.output.console.LongPrinter;
 import com.example.output.console.LongPrinterImpl;
 import com.example.output.console.WordPrinterImpl;
@@ -101,8 +103,8 @@ public class Main {
             LongPrinter longPrinterImpl = new LongPrinterImpl();
             Processor<Long> processor = new NumberProcessor();
 
-            Strategy strategy = new ReadingWordsStrategy();
-            strategy.setScanner(scanner);
+            Strategy strategy = new ReadingWordsFromConsoleStrategy();
+            strategy.setSource(scanner);
 
             Context context = new Context();
             List<String> strings = context.getInputs(strategy);
@@ -121,8 +123,8 @@ public class Main {
 
         } else if (Objects.equals(validType, "word")) {
             Processor<String> processor = new StringProcessor();
-            Strategy strategy = new ReadingWordsStrategy();
-            strategy.setScanner(scanner);
+            Strategy strategy = new ReadingWordsFromConsoleStrategy();
+            strategy.setSource(scanner);
 
             Context context = new Context();
             List<String> strings = context.getInputs(strategy);
@@ -138,8 +140,8 @@ public class Main {
 
         } else if (Objects.equals(validType, "line")) {
             Processor<String> processor = new StringProcessor();
-            Strategy strategy = new ReadingLinesStrategy();
-            strategy.setScanner(scanner);
+            Strategy strategy = new ReadingLinesFromConsoleStrategy();
+            strategy.setSource(scanner);
 
             Context context = new Context();
             List<String> strings = context.getInputs(strategy);

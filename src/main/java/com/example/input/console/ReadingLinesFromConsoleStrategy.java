@@ -1,19 +1,21 @@
 package com.example.input.console;
 
+import com.example.input.Strategy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ReadingLinesStrategy implements Strategy {
+public class ReadingLinesFromConsoleStrategy implements Strategy<Scanner> {
 
     private Scanner scanner;
 
-    public ReadingLinesStrategy() {
+    public ReadingLinesFromConsoleStrategy() {
     }
 
     @Override
-    public void setScanner(Scanner scanner) {
-        this.scanner = scanner;
+    public void setSource(Scanner source) {
+        this.scanner = source;
     }
 
     @Override
