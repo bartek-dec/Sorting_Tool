@@ -1,4 +1,4 @@
-package com.example.output.console;
+package com.example.output.printers;
 
 import com.example.data.result.Result;
 

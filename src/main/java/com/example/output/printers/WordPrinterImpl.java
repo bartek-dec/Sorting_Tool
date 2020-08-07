@@ -1,4 +1,4 @@
-package com.example.output.console;
+package com.example.output.printers;
 
 import com.example.data.result.Result;
 
@@ -55,6 +55,6 @@ public class WordPrinterImpl implements WordPrinter {
 
         strings.stream().forEach(o -> builder.append(o + "\n"));
 
-        return builder.toString();
+        return builder.toString().trim();
     }
 }

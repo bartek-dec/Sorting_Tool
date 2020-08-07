@@ -1,4 +1,4 @@
-package com.example.output.console;
+package com.example.output.printers;
 
 import com.example.data.result.Result;
 
@@ -38,6 +38,6 @@ public class LongPrinterImpl implements LongPrinter {
                 .forEach(o -> builder.append(o.getEntry()).append(": ")
                         .append(o.getCount()).append(" time(s), ").append(o.getPercentage()).append("%\n"));
 
-        return builder.toString();
+        return builder.toString().trim();
     }
 }

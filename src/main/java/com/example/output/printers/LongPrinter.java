@@ -1,4 +1,4 @@
-package com.example.output.console;
+package com.example.output.printers;
 
 import java.util.List;
 
