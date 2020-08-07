@@ -1,6 +1,6 @@
-package com.example.output.list;
+package com.example.output.console;
 
-import com.example.Result;
+import com.example.data.result.Result;
 
 import java.util.List;
 

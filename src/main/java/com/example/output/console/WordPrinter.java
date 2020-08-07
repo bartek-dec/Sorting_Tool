@@ -1,8 +1,8 @@
-package com.example.output.list;
+package com.example.output.console;
 
 import java.util.List;
 
-public interface StringPrinter {
+public interface WordPrinter extends ResultPrinter<String>{
 
     String printWordList(List<String> strings);
 

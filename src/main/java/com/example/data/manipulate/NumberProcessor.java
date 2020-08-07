@@ -1,7 +1,7 @@
-package com.example.data;
+package com.example.data.manipulate;
 
-import com.example.IntResult;
-import com.example.Result;
+import com.example.data.result.IntResult;
+import com.example.data.result.Result;
 
 import java.util.*;
 import java.util.stream.Collectors;

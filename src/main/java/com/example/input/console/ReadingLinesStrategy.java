@@ -1,14 +1,14 @@
-package com.example.strategy;
+package com.example.input.console;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ReadingWordsStrategy implements ReadingStrategy<String> {
+public class ReadingLinesStrategy implements Strategy {
 
     private Scanner scanner;
 
-    public ReadingWordsStrategy() {
+    public ReadingLinesStrategy() {
     }
 
     @Override
@@ -21,10 +21,7 @@ public class ReadingWordsStrategy implements ReadingStrategy<String> {
         List<String> inputs = new ArrayList<>();
 
         while (scanner.hasNext()) {
-            String[] line = scanner.nextLine().split("\\s+");
-            for (String s : line) {
-                inputs.add(s);
-            }
+            inputs.add(scanner.nextLine());
         }
         return inputs;
     }

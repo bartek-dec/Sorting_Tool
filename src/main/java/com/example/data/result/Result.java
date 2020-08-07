@@ -1,4 +1,4 @@
-package com.example;
+package com.example.data.result;
 
 public interface Result<T> {
 

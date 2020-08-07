@@ -1,7 +1,7 @@
-package com.example.data;
+package com.example.data.manipulate;
 
-import com.example.Result;
-import com.example.StringResult;
+import com.example.data.result.Result;
+import com.example.data.result.StringResult;
 
 import java.util.ArrayList;
 import java.util.Comparator;

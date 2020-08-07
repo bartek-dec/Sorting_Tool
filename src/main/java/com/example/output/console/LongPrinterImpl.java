@@ -1,13 +1,13 @@
-package com.example.output.list;
+package com.example.output.console;
 
-import com.example.Result;
+import com.example.data.result.Result;
 
 import java.util.List;
 
-public class IntegerPrinter implements IntPrinter, ResultPrinter<Long> {
+public class LongPrinterImpl implements LongPrinter {
 
     @Override
-    public String printIntegerList(List<Long> integers) {
+    public String printNumberList(List<Long> integers) {
         if (integers == null) {
             return null;
         }

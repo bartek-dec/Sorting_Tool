@@ -1,11 +1,15 @@
 package com.example;
 
-import com.example.data.NumberProcessor;
-import com.example.data.Processor;
-import com.example.data.StringProcessor;
-import com.example.output.list.IntegerPrinter;
-import com.example.output.list.WordPrinter;
-import com.example.strategy.*;
+import com.example.data.manipulate.NumberProcessor;
+import com.example.data.manipulate.Processor;
+import com.example.data.manipulate.StringProcessor;
+import com.example.data.result.Result;
+import com.example.output.console.LongPrinter;
+import com.example.output.console.LongPrinterImpl;
+import com.example.output.console.WordPrinterImpl;
+import com.example.input.console.*;
+import com.example.util.Converter;
+import com.example.util.LongConverter;
 
 import java.util.Arrays;
 import java.util.List;
@@ -92,60 +96,61 @@ public class Main {
             validSort = "natural";
         }
 
-        WordPrinter wordPrinter = new WordPrinter();
+        WordPrinterImpl wordPrinterImpl = new WordPrinterImpl();
         if (Objects.equals(validType, "long")) {
-            IntegerPrinter integerPrinter = new IntegerPrinter();
+            LongPrinter longPrinterImpl = new LongPrinterImpl();
             Processor<Long> processor = new NumberProcessor();
-            ReadingStrategy<Long> strategy = new ReadingIntegersStrategy();
+
+            Strategy strategy = new ReadingWordsStrategy();
             strategy.setScanner(scanner);
 
-            Context<Long> context = new Context<>();
-            context.setStrategy(strategy);
-            List<Long> integers = context.getInputs();
+            Context context = new Context();
+            List<String> strings = context.getInputs(strategy);
+
+            Converter<Long> converter = new LongConverter();
+            List<Long> longs = converter.convertToNumbers(strings);
 
             if (Objects.equals(validSort, "natural")) {
-                List<Long> sorted = processor.sortAscending(integers);
-                System.out.println(integerPrinter.printIntegerList(sorted));
+                List<Long> sorted = processor.sortAscending(longs);
+                System.out.println(longPrinterImpl.printNumberList(sorted));
             } else {
-                List<Result<Long>> sorted = processor.sortByCount(integers);
-                int size = integers.size();
-                System.out.println(integerPrinter.printResultList(sorted, size));
+                List<Result<Long>> sorted = processor.sortByCount(longs);
+                int size = longs.size();
+                System.out.println(longPrinterImpl.printResultList(sorted, size));
             }
 
         } else if (Objects.equals(validType, "word")) {
             Processor<String> processor = new StringProcessor();
-            ReadingStrategy<String> strategy = new ReadingWordsStrategy();
+            Strategy strategy = new ReadingWordsStrategy();
             strategy.setScanner(scanner);
 
-            Context<String> context = new Context<>();
-            context.setStrategy(strategy);
-            List<String> strings = context.getInputs();
+            Context context = new Context();
+            List<String> strings = context.getInputs(strategy);
 
             if (Objects.equals(validSort, "natural")) {
                 List<String> sorted = processor.sortAscending(strings);
-                System.out.println(wordPrinter.printWordList(sorted));
+                System.out.println(wordPrinterImpl.printWordList(sorted));
             } else {
                 List<Result<String>> sorted = processor.sortByCount(strings);
                 int size = strings.size();
-                System.out.println(wordPrinter.printResultList(sorted, size));
+                System.out.println(wordPrinterImpl.printResultList(sorted, size));
             }
 
         } else if (Objects.equals(validType, "line")) {
             Processor<String> processor = new StringProcessor();
-            ReadingStrategy<String> strategy = new ReadingLinesStrategy();
+            Strategy strategy = new ReadingLinesStrategy();
             strategy.setScanner(scanner);
 
-            Context<String> context = new Context<>();
-            context.setStrategy(strategy);
-            List<String> strings = context.getInputs();
+            Context context = new Context();
+            List<String> strings = context.getInputs(strategy);
 
             if (Objects.equals(validSort, "natural")) {
                 List<String> sorted = processor.sortAscending(strings);
-                System.out.println(wordPrinter.printLineList(sorted));
+                System.out.println(wordPrinterImpl.printLineList(sorted));
             } else {
                 List<Result<String>> sorted = processor.sortByCount(strings);
                 int size = strings.size();
-                System.out.println(wordPrinter.printResultList(sorted, size));
+                System.out.println(wordPrinterImpl.printResultList(sorted, size));
             }
         }
     }

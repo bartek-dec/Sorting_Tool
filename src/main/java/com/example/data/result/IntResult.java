@@ -1,18 +1,18 @@
-package com.example;
+package com.example.data.result;
 
-public class StringResult implements Result<String> {
+public class IntResult implements Result<Long> {
 
-    private String entry;
+    private Long entry;
     private long count;
     private int percentage;
 
     @Override
-    public String getEntry() {
+    public Long getEntry() {
         return entry;
     }
 
     @Override
-    public void setEntry(String entry) {
+    public void setEntry(Long entry) {
         this.entry = entry;
     }
 
