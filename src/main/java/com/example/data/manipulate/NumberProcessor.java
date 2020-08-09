@@ -1,25 +1,14 @@
 package com.example.data.manipulate;
 
-import com.example.data.result.IntResult;
+import com.example.data.result.LongResult;
 import com.example.data.result.Result;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class NumberProcessor implements Processor<Long> {
-
-    @Override
-    public Long countInputs(List<Long> inputs) {
-        return inputs.stream().count();
-    }
-
-    @Override
-    public Long getGreatest(List<Long> inputs) {
-        Optional<Long> optional = inputs.stream()
-                .max(Comparator.naturalOrder());
-
-        return optional.orElse(null);
-    }
 
     @Override
     public Long getQuantity(List<Long> inputs, Long itemToFind) {
@@ -54,7 +43,7 @@ public class NumberProcessor implements Processor<Long> {
         int size = sortedAndUnique.size();
         int totalNumber = inputs.size();
         for (int i = 0; i < size; i++) {
-            Result<Long> result = new IntResult();
+            Result<Long> result = new LongResult();
 
             long current = sortedAndUnique.get(i);
             long count = getQuantity(inputs, current);

@@ -1,5 +1,7 @@
 package com.example.data.result;
 
+import java.util.Objects;
+
 public class StringResult implements Result<String> {
 
     private String entry;
@@ -34,5 +36,20 @@ public class StringResult implements Result<String> {
     @Override
     public void setPercentage(int percentage) {
         this.percentage = percentage;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringResult that = (StringResult) o;
+        return count == that.count &&
+                percentage == that.percentage &&
+                entry.equals(that.entry);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entry, count, percentage);
     }
 }

@@ -6,36 +6,9 @@ import com.example.data.result.StringResult;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class StringProcessor implements Processor<String> {
-
-    @Override
-    public Long countInputs(List<String> inputs) {
-        return inputs.stream().count();
-    }
-
-    @Override
-    public String getGreatest(List<String> inputs) {
-        Optional<String> optionalLongest = inputs.stream()
-                .max(Comparator.comparingInt(String::length));
-
-        String longest;
-        int length;
-        if (optionalLongest.isPresent()) {
-            longest = optionalLongest.get();
-            length = longest.length();
-        } else {
-            return null;
-        }
-
-        Optional<String> optionalLargest = inputs.stream()
-                .filter(o -> o.length() == length)
-                .max(Comparator.naturalOrder());
-
-        return optionalLargest.orElse(null);
-    }
 
     @Override
     public Long getQuantity(List<String> inputs, String itemToFind) {

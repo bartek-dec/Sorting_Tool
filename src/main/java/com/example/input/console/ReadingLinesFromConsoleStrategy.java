@@ -23,7 +23,8 @@ public class ReadingLinesFromConsoleStrategy implements Strategy<Scanner> {
         List<String> inputs = new ArrayList<>();
 
         while (scanner.hasNext()) {
-            inputs.add(scanner.nextLine());
+            String line = scanner.nextLine();
+            inputs.add(line);
         }
         return inputs;
     }

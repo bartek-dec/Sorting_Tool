@@ -24,14 +24,14 @@ public class LongPrinterImpl implements LongPrinter {
     }
 
     @Override
-    public String printResultList(List<Result<Long>> results, int quantity) {
+    public String printResultList(List<Result<Long>> results, int quantity, String name) {
         if (results == null) {
             return null;
         }
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append("Total numbers: ");
+        builder.append("Total ").append(name).append(": ");
         builder.append(quantity).append(".\n");
 
         results.stream()

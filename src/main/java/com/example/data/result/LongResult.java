@@ -1,6 +1,8 @@
 package com.example.data.result;
 
-public class IntResult implements Result<Long> {
+import java.util.Objects;
+
+public class LongResult implements Result<Long> {
 
     private Long entry;
     private long count;
@@ -34,5 +36,20 @@ public class IntResult implements Result<Long> {
     @Override
     public void setPercentage(int percentage) {
         this.percentage = percentage;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LongResult result = (LongResult) o;
+        return count == result.count &&
+                percentage == result.percentage &&
+                entry.equals(result.entry);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(entry, count, percentage);
     }
 }

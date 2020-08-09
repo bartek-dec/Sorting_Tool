@@ -6,13 +6,22 @@ import com.example.data.manipulate.StringProcessor;
 import com.example.data.result.Result;
 import com.example.input.Context;
 import com.example.input.Strategy;
+import com.example.input.console.ReadingLinesFromConsoleStrategy;
+import com.example.input.console.ReadingWordsFromConsoleStrategy;
+import com.example.input.file.ReadingLinesFromFileStrategy;
+import com.example.input.file.ReadingWordsFromFileStrategy;
+import com.example.output.file.FileSaver;
+import com.example.output.file.Saver;
 import com.example.output.printers.LongPrinter;
 import com.example.output.printers.LongPrinterImpl;
+import com.example.output.printers.WordPrinter;
 import com.example.output.printers.WordPrinterImpl;
-import com.example.input.console.*;
 import com.example.util.Converter;
 import com.example.util.LongConverter;
+import com.example.util.Params;
+import com.example.util.Validator;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -20,152 +29,165 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final String DATA_TYPE = "-dataType";
-    private static final String SORTING_TYPE = "-sortingType";
-    private static final String INPUT_FILE = "-inputFile";
-    private static final String OUTPUT_FILE = "-outputFile";
-    private static final String SUFFIX = ".txt";
-    private static final String LONG = "long";
-    private static final String WORD = "word";
-    private static final String LINE = "line";
-    private static final String NATURAL = "natural";
-    private static final String BY_COUNT = "byCount";
+    private static final String INPUT_SOURCE = "./src/main/resources/";
+    private static final String OUTPUT_SOURCE = "./src/main/resources/";
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
         List<String> parameters = Arrays.asList(args);
+        Validator validator = new Validator();
 
-        int index;
-        String validType = null;
-        String type;
-        if (parameters.contains(DATA_TYPE)) {
-            index = parameters.indexOf(DATA_TYPE);
-            try {
-                index++;
-                type = parameters.get(index);
-                while (!Objects.equals(type, SORTING_TYPE)) {
-
-                    if (Objects.equals(type, LONG) ||
-                            Objects.equals(type, WORD) ||
-                            Objects.equals(type, LINE)) {
-                        validType = type;
-                    } else {
-                        System.out.println("\"" + type + "\" isn't a valid parameter. It's skipped.");
-                    }
-                    index++;
-                    type = parameters.get(index);
-                }
-            } catch (IndexOutOfBoundsException e) {
-                if (!Objects.equals(validType, LONG) &&
-                        !Objects.equals(validType, WORD) &&
-                        !Objects.equals(validType, LINE)) {
-                    System.out.println("No data type defined!");
-                    return;
-                }
-            }
-
-            if (!Objects.equals(validType, LONG) &&
-                    !Objects.equals(validType, WORD) &&
-                    !Objects.equals(validType, LINE)) {
-                System.out.println("No data type defined!");
-                return;
-            }
-        } else {
-            validType = WORD;
+        String validType = validator.checkDataParameters(parameters);
+        if (validType == null) {
+            return;
         }
 
-
-        String validSort = null;
-        String sort;
-        if (parameters.contains(SORTING_TYPE)) {
-            index = parameters.indexOf(SORTING_TYPE);
-            try {
-                index++;
-                sort = parameters.get(index);
-                while (!Objects.equals(sort, DATA_TYPE)) {
-
-                    if (Objects.equals(sort, NATURAL) ||
-                            Objects.equals(sort, BY_COUNT)) {
-                        validSort = sort;
-                    } else {
-                        System.out.println("\"" + sort + "\" isn't a valid parameter. It's skipped.");
-                    }
-                    index++;
-                    sort = parameters.get(index);
-                }
-            } catch (IndexOutOfBoundsException e) {
-                if (!Objects.equals(validSort, NATURAL) &&
-                        !Objects.equals(validSort, BY_COUNT)) {
-                    System.out.println("No sorting type defined!");
-                    return;
-                }
-            }
-
-            if (!Objects.equals(validSort, NATURAL) &&
-                    !Objects.equals(validSort, BY_COUNT)) {
-                System.out.println("No sorting type defined!");
-                return;
-            }
-        } else {
-            validSort = NATURAL;
+        String validSort = validator.checkSortingParameters(parameters);
+        if (validSort == null) {
+            return;
         }
 
-        WordPrinterImpl wordPrinterImpl = new WordPrinterImpl();
-        if (Objects.equals(validType, LONG)) {
-            LongPrinter longPrinterImpl = new LongPrinterImpl();
-            Processor<Long> processor = new NumberProcessor();
+        String validInputName = validator.checkInputOutputParameters(parameters, Params.INPUT_FILE,
+                Params.OUTPUT_FILE, "input");
+        if (validInputName != null && !validInputName.matches(Params.MATCHER)) {
+            return;
+        }
 
-            Strategy strategy = new ReadingWordsFromConsoleStrategy();
-            strategy.setSource(scanner);
+        String validOutputName = validator.checkInputOutputParameters(parameters, Params.OUTPUT_FILE,
+                Params.INPUT_FILE, "output");
+        if (validOutputName != null && !validOutputName.matches(Params.MATCHER)) {
+            return;
+        }
 
-            Context context = new Context();
-            List<String> strings = context.getInputs(strategy);
+        Scanner scanner = new Scanner(System.in);
+        Context context = new Context();
+        Converter<Long> longConverter = new LongConverter();
+        File inputFile = new File(INPUT_SOURCE + validInputName);
+        File outputFile = new File(OUTPUT_SOURCE + validOutputName);
+        Processor<Long> longProcessor = new NumberProcessor();
+        Processor<String> stringProcessor = new StringProcessor();
+        LongPrinter longPrinter = new LongPrinterImpl();
+        WordPrinter wordPrinter = new WordPrinterImpl();
+        Saver saver = new FileSaver();
 
-            Converter<Long> converter = new LongConverter();
-            List<Long> longs = converter.convertToNumbers(strings);
+        boolean isValidType = Objects.equals(validType, Params.LONG) ||
+                Objects.equals(validType, Params.WORD) ||
+                Objects.equals(validType, Params.LINE);
 
-            if (Objects.equals(validSort, NATURAL)) {
-                List<Long> sorted = processor.sortAscending(longs);
-                System.out.println(longPrinterImpl.printNumberList(sorted));
+        List<String> words;
+        List<Long> numbers;
+        String result;
+        Strategy<Scanner> scannerStrategy;
+        Strategy<File> fileStrategy;
+
+        if (isValidType && validInputName == null) {
+            scannerStrategy = new ReadingWordsFromConsoleStrategy();
+            scannerStrategy.setSource(scanner);
+
+            if (Objects.equals(validType, Params.LONG)) {
+                words = context.getInputs(scannerStrategy);
+                numbers = longConverter.convertToNumbers(words);
+
+                if (Objects.equals(validSort, Params.NATURAL)) {
+                    result = processNumbersNatural(longProcessor, longPrinter, numbers);
+                } else {
+                    result = processNumbersByCount(longProcessor, longPrinter, numbers, "numbers");
+                }
+            } else if (Objects.equals(validType, Params.WORD)) {
+                words = context.getInputs(scannerStrategy);
+                if (Objects.equals(validSort, Params.NATURAL)) {
+                    result = processStringsNatural(stringProcessor, wordPrinter, words);
+                } else {
+                    result = processStringsByCount(stringProcessor, wordPrinter, words, "words");
+                }
             } else {
-                List<Result<Long>> sorted = processor.sortByCount(longs);
-                int size = longs.size();
-                System.out.println(longPrinterImpl.printResultList(sorted, size));
+                scannerStrategy = new ReadingLinesFromConsoleStrategy();
+                scannerStrategy.setSource(scanner);
+                words = context.getInputs(scannerStrategy);
+
+                if (Objects.equals(validSort, Params.NATURAL)) {
+                    result = processStringsNatural(stringProcessor, wordPrinter, words);
+                } else {
+                    result = processStringsByCount(stringProcessor, wordPrinter, words, "lines");
+                }
             }
+            saveResult(validOutputName, outputFile, saver, result);
 
-        } else if (Objects.equals(validType, WORD)) {
-            Processor<String> processor = new StringProcessor();
-            Strategy strategy = new ReadingWordsFromConsoleStrategy();
-            strategy.setSource(scanner);
+        } else if (isValidType && validInputName != null) {
+            fileStrategy = new ReadingWordsFromFileStrategy();
+            fileStrategy.setSource(inputFile);
 
-            Context context = new Context();
-            List<String> strings = context.getInputs(strategy);
+            if (Objects.equals(validType, Params.LONG)) {
+                words = context.getInputs(fileStrategy);
+                numbers = longConverter.convertToNumbers(words);
 
-            if (Objects.equals(validSort, NATURAL)) {
-                List<String> sorted = processor.sortAscending(strings);
-                System.out.println(wordPrinterImpl.printWordList(sorted));
+                if (Objects.equals(validSort, Params.NATURAL)) {
+                    result = processNumbersNatural(longProcessor, longPrinter, numbers);
+                } else {
+                    result = processNumbersByCount(longProcessor, longPrinter, numbers, "numbers");
+                }
+            } else if (Objects.equals(validType, Params.WORD)) {
+                words = context.getInputs(fileStrategy);
+                if (Objects.equals(validSort, Params.NATURAL)) {
+                    result = processStringsNatural(stringProcessor, wordPrinter, words);
+                } else {
+                    result = processStringsByCount(stringProcessor, wordPrinter, words, "words");
+                }
             } else {
-                List<Result<String>> sorted = processor.sortByCount(strings);
-                int size = strings.size();
-                System.out.println(wordPrinterImpl.printResultList(sorted, size));
+                fileStrategy = new ReadingLinesFromFileStrategy();
+                fileStrategy.setSource(inputFile);
+                words = context.getInputs(fileStrategy);
+
+                if (Objects.equals(validSort, Params.NATURAL)) {
+                    result = processStringsNatural(stringProcessor, wordPrinter, words);
+                } else {
+                    result = processStringsByCount(stringProcessor, wordPrinter, words, "lines");
+                }
             }
+            saveResult(validOutputName, outputFile, saver, result);
+        }
+    }
 
-        } else if (Objects.equals(validType, LINE)) {
-            Processor<String> processor = new StringProcessor();
-            Strategy strategy = new ReadingLinesFromConsoleStrategy();
-            strategy.setSource(scanner);
+    private static String processNumbersByCount(Processor<Long> longProcessor, LongPrinter longPrinter,
+                                                List<Long> numbers, String name) {
+        List<Result<Long>> longResults;
+        String result;
+        longResults = longProcessor.sortByCount(numbers);
+        result = longPrinter.printResultList(longResults, numbers.size(), name);
+        return result;
+    }
 
-            Context context = new Context();
-            List<String> strings = context.getInputs(strategy);
+    private static String processNumbersNatural(Processor<Long> longProcessor, LongPrinter longPrinter,
+                                                List<Long> numbers) {
+        List<Long> sortedNumbers;
+        String result;
+        sortedNumbers = longProcessor.sortAscending(numbers);
+        result = longPrinter.printNumberList(sortedNumbers);
+        return result;
+    }
 
-            if (Objects.equals(validSort, NATURAL)) {
-                List<String> sorted = processor.sortAscending(strings);
-                System.out.println(wordPrinterImpl.printLineList(sorted));
-            } else {
-                List<Result<String>> sorted = processor.sortByCount(strings);
-                int size = strings.size();
-                System.out.println(wordPrinterImpl.printResultList(sorted, size));
-            }
+    private static String processStringsNatural(Processor<String> stringProcessor, WordPrinter wordPrinter,
+                                                List<String> words) {
+        List<String> sortedStrings;
+        String result;
+        sortedStrings = stringProcessor.sortAscending(words);
+        result = wordPrinter.printWordList(sortedStrings);
+        return result;
+    }
+
+    private static String processStringsByCount(Processor<String> stringProcessor, WordPrinter wordPrinter,
+                                                List<String> words, String name) {
+        List<Result<String>> stringResults;
+        String result;
+        stringResults = stringProcessor.sortByCount(words);
+        result = wordPrinter.printResultList(stringResults, words.size(), name);
+        return result;
+    }
+
+    private static void saveResult(String validOutputName, File outputFile, Saver saver, String result) {
+        if (validOutputName == null) {
+            System.out.println(result);
+        } else {
+            saver.saveToFile(outputFile, result);
         }
     }
 }
